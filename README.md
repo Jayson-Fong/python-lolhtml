@@ -17,7 +17,7 @@
 
 <div align="center">
 
-[💼 Purpose](#purpose) | [⚡ Performance](#performance) | [⚙️ Usage](#usage)
+[💼 Purpose](#purpose) | [⚡ Performance](#performance) | [⚙️ Usage](#usage) | [⚖️ License](#license)
 
 </div>
 
@@ -170,3 +170,8 @@ with requests.get("https://example.com", stream=True) as r:
     rewriter.end()
     print(output.decode("utf-8"))
 ```
+
+# License
+
+While the python-lolhtml code is under the MIT license, the distribution (built `.whl` files) include lol-html, which is 
+licensed under the BSD 3-Clause License.

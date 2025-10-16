@@ -11,11 +11,12 @@ authors = [
 ]
 description = "Python bindings for the lol-html Rust crate"
 readme = "README.md"
-license = { text = "MIT" }
-license-files = ["LICENSE"]
+license = { text = "MIT + BSD-3-Clause (for bundled lol-html)" }
+license-files = ["LICENSE-MIT", "LICENSE-BSD"]
 classifiers = [
-    "Development Status :: 1 - Planning",
+    "Development Status :: 3 - Alpha",
     "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
     "Programming Language :: Rust",
     "Programming Language :: Python :: Implementation :: CPython",
