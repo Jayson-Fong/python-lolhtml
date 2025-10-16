@@ -171,6 +171,8 @@ with requests.get("https://example.com", stream=True) as r:
     print(output.decode("utf-8"))
 ```
 
+A variety of method and property-specific examples can be found in [python-lolhtml/tests](https://github.com/Jayson-Fong/python-lolhtml/tree/main/tests).
+
 # License
 
 While the python-lolhtml code is under the MIT license, the distribution (built `.whl` files) include lol-html, which is 
