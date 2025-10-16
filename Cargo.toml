@@ -11,3 +11,4 @@ crate-type = ["cdylib"]
 [dependencies]
 pyo3 = "0.26.0"
 lol_html = "2.7"
+thiserror = "1.0"

@@ -43,14 +43,18 @@ python-lolhtml; however, when parsing real-world websites such as Wikipedia, the
 parsing time.
 
 The following example fetches a Wikipedia article about the Python programming language. While this metric is not run on
-standardized hardware (rather, it is a consumer-grace laptop with an Intel CPU), it produces the following output:
+standardized hardware (rather, it is a consumer-grade laptop with an Intel CPU), it produces the following output:
 
 ```
-BeautifulSoup4: 36.397512998009915
-python-lolhtml: 25.727217955995002
+BeautifulSoup4: 36.069569201001286 seconds
+python-lolhtml: 15.644805246000033 seconds
+python-lolhtml Speedup: 2.305530087069849
 ```
 
-This demonstrates roughly a 1.4x speedup compared to parsing conducted with BeautifulSoup4 for text extraction.
+This demonstrates roughly a 2.3x speedup compared to parsing conducted with BeautifulSoup4 for text extraction.
+
+<details style="border: 1px solid; border-radius: 8px; padding: 8px; margin-top: 4px;">
+<summary>🚰 Source Code</summary>
 
 ```python
 import timeit
@@ -62,10 +66,10 @@ from bs4 import BeautifulSoup
 import lolhtml
 
 
-content: str = requests.get(
+content: bytes = requests.get(
     "https://en.wikipedia.org/wiki/Python_(programming_language)",
     headers={"User-Agent": "Python - Performance Testing"},
-).text
+).text.encode("utf-8")
 
 
 def time_beautiful_soup():
@@ -82,57 +86,85 @@ class ElementHandler:
         self.value_store.append(text_chunk.text)
 
 
-rewriter: lolhtml.HTMLRewriter = lolhtml.HTMLRewriter()
-element_handler: ElementHandler = ElementHandler([])
-rewriter.on("*", element_handler)
-
-
 def time_lolhtml():
-    element_handler.value_store = []
-    rewriter.transform(content)
+    output: bytearray = bytearray()
+    element_handler: ElementHandler = ElementHandler([])
+
+    rewriter: lolhtml.HTMLRewriter = lolhtml.HTMLRewriter(output.extend)
+    rewriter.on("*", element_handler)
+    rewriter.write(content)
+    rewriter.end()
 
 
-print("BeautifulSoup4:", timeit.timeit(time_beautiful_soup, number=100))
-print("python-lolhtml:", timeit.timeit(time_lolhtml, number=100))
+beautiful_soup_time: float = timeit.timeit(time_beautiful_soup, number=100)
+print("BeautifulSoup4:", beautiful_soup_time, "seconds")
+
+python_lolhtml_time: float = timeit.timeit(time_lolhtml, number=100)
+print("python-lolhtml:", python_lolhtml_time, "seconds")
+print("python-lolhtml Speedup:", beautiful_soup_time / python_lolhtml_time)
 ```
+
+</details>
 
 </details>
 
 # Usage
 
-For any rewriting or parsing task, a `lolhtml.HTMLRewriter` is required:
+For each rewriting or parsing task, a `lolhtml.HTMLRewriter` instance is required. It includes a buffer that can be 
+written to where the content is then streamed, matching is performed against CSS selectors, and handlers are executed
+as defined.
 
-Each HTML rewriter can be reused and is not tied to the content used for parsing (unless customization is made to the 
-contrary). A CSS selector is required to specify which part of the content to target. For each CSS selector, an element
-handler is required, which can process entries at an element, text chunk, or comment-level.
-
-The following example strips all comments from the HTML payload:
+For example, to upgrade anchor links:
 
 ```python
 import lolhtml
 
 
-class ElementHandler:
-    def comments(self, comment: lolhtml.Comment):
-        comment.remove()
+class AnchorUpgrader:
+    # noinspection PyMethodMayBeStatic
+    def element(self, el: lolhtml.Element):
+        if not el.has_attribute("href"):
+            return
+        
+        current_link: str = el.get_attribute("href")
+        if current_link.startswith("http://"):
+            el.set_attribute("href", "https" + current_link[4:])
+            
 
-rewriter: lolhtml.HTMLRewriter = lolhtml.HTMLRewriter()
-rewriter.on("*", ElementHandler())
-rewriter.transform("<html><!-- Payload Goes Here --></html>")
+output: bytearray = bytearray()
+rewriter: lolhtml.HTMLRewriter = lolhtml.HTMLRewriter(output.extend)
+rewriter.on("a", AnchorUpgrader())
+
+rewriter.write(b'<html><a href="http://example">Link</a></html>')
+rewriter.end()
+
+print(output)
 ```
 
-A rewriter can contain encompass many element handlers. If no element handlers are provided, it effectively functions as
-pass-through.
+You may also choose to stream content and provide it to the HTMLRewriter instance as it becomes available:
 
-Element handlers are expected to implement one or more of these methods:
 ```python
 import lolhtml
+import requests
 
-class ElementHandler:
-    def element(self, el: lolhtml.Element): ...
-    def comments(self, c: lolhtml.Comment): ...
-    def text(self, t: lolhtml.TextChunk): ...
+
+class HeaderSwapHandler:
+    # noinspection PyMethodMayBeStatic
+    def text(self, t: lolhtml.TextChunk):
+        if t.text == "Example Domain":
+            t.replace("python-lolhtml Example")
+
+
+with requests.get("https://example.com", stream=True) as r:
+    r.raise_for_status()
+
+    output: bytearray = bytearray()
+    rewriter: lolhtml.HTMLRewriter = lolhtml.HTMLRewriter(output.extend)
+    rewriter.on("h1, title", HeaderSwapHandler())
+
+    for chunk in r.iter_content(chunk_size=8192):
+        rewriter.write(chunk)
+
+    rewriter.end()
+    print(output.decode("utf-8"))
 ```
-
-When lolhtml streams the content and encounters an element, comment, or text chunk matching a selector, it will execute
-the appropriate method of the element handler.

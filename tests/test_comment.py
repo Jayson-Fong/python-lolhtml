@@ -1,110 +1,186 @@
+import threading
+
 import lolhtml
 
 
 def test_metadata():
+    comment_processed: threading.Event = threading.Event()
+
     class ElementHandler:
+        # noinspection PyMethodMayBeStatic
         def comments(self, comment: lolhtml.Comment):
+            assert not comment_processed.is_set()
+            comment_processed.set()
             assert comment.text == " Hello World "
             assert not comment.removed
 
-    rewriter: lolhtml.HTMLRewriter = lolhtml.HTMLRewriter()
+    output: bytearray = bytearray()
+    rewriter: lolhtml.HTMLRewriter = lolhtml.HTMLRewriter(output.extend)
     rewriter.on("*", ElementHandler())
+    rewriter.write(b"<html><!-- Hello World --></html>")
+    rewriter.end()
 
-    rewriter.transform(b"<html><!-- Hello World --></html>")
+    assert comment_processed.is_set()
 
 
 def test_set_text():
-    class ElementHandler:
-        def comments(self, comment: lolhtml.Comment):
-            comment.set_text("Set Comment")
+    comment_processed: threading.Event = threading.Event()
 
-    rewriter: lolhtml.HTMLRewriter = lolhtml.HTMLRewriter()
+    class ElementHandler:
+        # noinspection PyMethodMayBeStatic
+        def comments(self, comment: lolhtml.Comment):
+            assert not comment_processed.is_set()
+            comment_processed.set()
+            comment.text = "Set Comment"
+
+    output: bytearray = bytearray()
+    rewriter: lolhtml.HTMLRewriter = lolhtml.HTMLRewriter(output.extend)
     rewriter.on("html", ElementHandler())
 
-    result = rewriter.transform(b"<html><!-- Hello World --></html>")
-    assert result == b"<html><!--Set Comment--></html>"
+    rewriter.write(b"<html><!-- Hello World --></html>")
+    rewriter.end()
+
+    assert output == b"<html><!--Set Comment--></html>"
+    assert comment_processed.is_set()
 
 
 def test_remove():
+    comment_processed: threading.Event = threading.Event()
+
     class ElementHandler:
+        # noinspection PyMethodMayBeStatic
         def comments(self, comment: lolhtml.Comment):
+            assert not comment_processed.is_set()
+            comment_processed.set()
             comment.remove()
             assert comment.removed
 
-    rewriter: lolhtml.HTMLRewriter = lolhtml.HTMLRewriter()
+    output: bytearray = bytearray()
+    rewriter: lolhtml.HTMLRewriter = lolhtml.HTMLRewriter(output.extend)
     rewriter.on("html", ElementHandler())
 
-    result = rewriter.transform(b"<html><!-- Hello World --></html>")
-    assert result == b"<html></html>"
+    rewriter.write(b"<html><!-- Hello World --></html>")
+    rewriter.end()
+
+    assert output == b"<html></html>"
+    assert comment_processed.is_set()
 
 
 def test_before_text_inferred():
+    comment_processed: threading.Event = threading.Event()
+
     class ElementHandler:
         def comments(self, comment: lolhtml.Comment):
+            assert not comment_processed.is_set()
+            comment_processed.set()
             comment.before("<Test>")
 
-    rewriter: lolhtml.HTMLRewriter = lolhtml.HTMLRewriter()
+    output: bytearray = bytearray()
+    rewriter: lolhtml.HTMLRewriter = lolhtml.HTMLRewriter(output.extend)
     rewriter.on("html", ElementHandler())
 
-    result = rewriter.transform(b"<html><!-- Hello World --></html>")
-    assert result == b"<html>&lt;Test&gt;<!-- Hello World --></html>"
+    rewriter.write(b"<html><!-- Hello World --></html>")
+    rewriter.end()
+
+    assert output == b"<html>&lt;Test&gt;<!-- Hello World --></html>"
+    assert comment_processed.is_set()
 
 
 def test_before_text_explicit():
+    comment_processed: threading.Event = threading.Event()
+
     class ElementHandler:
         def comments(self, comment: lolhtml.Comment):
-            comment.before("<Test>", text=True)
+            assert not comment_processed.is_set()
+            comment_processed.set()
+            comment.before("<Test>", lolhtml.ContentType.TEXT)
 
-    rewriter: lolhtml.HTMLRewriter = lolhtml.HTMLRewriter()
+    output: bytearray = bytearray()
+    rewriter: lolhtml.HTMLRewriter = lolhtml.HTMLRewriter(output.extend)
     rewriter.on("html", ElementHandler())
 
-    result = rewriter.transform(b"<html><!-- Hello World --></html>")
-    assert result == b"<html>&lt;Test&gt;<!-- Hello World --></html>"
+    rewriter.write(b"<html><!-- Hello World --></html>")
+    rewriter.end()
+
+    assert output == b"<html>&lt;Test&gt;<!-- Hello World --></html>"
+    assert comment_processed.is_set()
 
 
 def test_before_html():
+    comment_processed: threading.Event = threading.Event()
+
     class ElementHandler:
         def comments(self, comment: lolhtml.Comment):
-            comment.before("<Test>", text=False)
+            assert not comment_processed.is_set()
+            comment_processed.set()
+            comment.before("<Test>", lolhtml.ContentType.HTML)
 
-    rewriter: lolhtml.HTMLRewriter = lolhtml.HTMLRewriter()
+    output: bytearray = bytearray()
+    rewriter: lolhtml.HTMLRewriter = lolhtml.HTMLRewriter(output.extend)
     rewriter.on("html", ElementHandler())
 
-    result = rewriter.transform(b"<html><!-- Hello World --></html>")
-    assert result == b"<html><Test><!-- Hello World --></html>"
+    rewriter.write(b"<html><!-- Hello World --></html>")
+    rewriter.end()
+
+    assert output == b"<html><Test><!-- Hello World --></html>"
+    assert comment_processed.is_set()
 
 
 def test_after_text_inferred():
+    comment_processed: threading.Event = threading.Event()
+
     class ElementHandler:
         def comments(self, comment: lolhtml.Comment):
+            assert not comment_processed.is_set()
+            comment_processed.set()
             comment.after("<Test>")
 
-    rewriter: lolhtml.HTMLRewriter = lolhtml.HTMLRewriter()
+    output: bytearray = bytearray()
+    rewriter: lolhtml.HTMLRewriter = lolhtml.HTMLRewriter(output.extend)
     rewriter.on("html", ElementHandler())
 
-    result = rewriter.transform(b"<html><!-- Hello World --></html>")
-    assert result == b"<html><!-- Hello World -->&lt;Test&gt;</html>"
+    rewriter.write(b"<html><!-- Hello World --></html>")
+    rewriter.end()
+
+    assert output == b"<html><!-- Hello World -->&lt;Test&gt;</html>"
+    assert comment_processed.is_set()
 
 
 def test_after_text_explicit():
+    comment_processed: threading.Event = threading.Event()
+
     class ElementHandler:
         def comments(self, comment: lolhtml.Comment):
-            comment.after("<Test>", text=True)
+            assert not comment_processed.is_set()
+            comment_processed.set()
+            comment.after("<Test>", lolhtml.ContentType.TEXT)
 
-    rewriter: lolhtml.HTMLRewriter = lolhtml.HTMLRewriter()
+    output: bytearray = bytearray()
+    rewriter: lolhtml.HTMLRewriter = lolhtml.HTMLRewriter(output.extend)
     rewriter.on("html", ElementHandler())
 
-    result = rewriter.transform(b"<html><!-- Hello World --></html>")
-    assert result == b"<html><!-- Hello World -->&lt;Test&gt;</html>"
+    rewriter.write(b"<html><!-- Hello World --></html>")
+    rewriter.end()
+
+    assert output == b"<html><!-- Hello World -->&lt;Test&gt;</html>"
+    assert comment_processed.is_set()
 
 
 def test_after_html():
+    comment_processed: threading.Event = threading.Event()
+
     class ElementHandler:
         def comments(self, comment: lolhtml.Comment):
-            comment.after("<Test>", text=False)
+            assert not comment_processed.is_set()
+            comment_processed.set()
+            comment.after("<Test>", lolhtml.ContentType.HTML)
 
-    rewriter: lolhtml.HTMLRewriter = lolhtml.HTMLRewriter()
+    output: bytearray = bytearray()
+    rewriter: lolhtml.HTMLRewriter = lolhtml.HTMLRewriter(output.extend)
     rewriter.on("html", ElementHandler())
 
-    result = rewriter.transform(b"<html><!-- Hello World --></html>")
-    assert result == b"<html><!-- Hello World --><Test></html>"
+    rewriter.write(b"<html><!-- Hello World --></html>")
+    rewriter.end()
+
+    assert output == b"<html><!-- Hello World --><Test></html>"
+    assert comment_processed.is_set()
