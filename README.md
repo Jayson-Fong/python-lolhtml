@@ -46,11 +46,11 @@ The following example fetches a Wikipedia article about the Python programming l
 standardized hardware (rather, it is a consumer-grace laptop with an Intel CPU), it produces the following output:
 
 ```
-BeautifulSoup4: 38.200176490994636
-python-lolhtml: 25.26178707300278
+BeautifulSoup4: 36.397512998009915
+python-lolhtml: 25.727217955995002
 ```
 
-This demonstrates roughly a 1.5x speedup compared to parsing conducted with BeautifulSoup4 for text extraction.
+This demonstrates roughly a 1.4x speedup compared to parsing conducted with BeautifulSoup4 for text extraction.
 
 ```python
 import timeit
@@ -82,18 +82,18 @@ class ElementHandler:
         self.value_store.append(text_chunk.text)
 
 
+rewriter: lolhtml.HTMLRewriter = lolhtml.HTMLRewriter()
+element_handler: ElementHandler = ElementHandler([])
+rewriter.on("*", element_handler)
+
+
 def time_lolhtml():
-    rewriter: lolhtml.HTMLRewriter = lolhtml.HTMLRewriter()
-
-    value_store: List[str] = []
-    rewriter.on("*", ElementHandler(value_store))
-
+    element_handler.value_store = []
     rewriter.transform(content)
 
 
 print("BeautifulSoup4:", timeit.timeit(time_beautiful_soup, number=100))
 print("python-lolhtml:", timeit.timeit(time_lolhtml, number=100))
-
 ```
 
 </details>
