@@ -3,7 +3,7 @@ import threading
 import lolhtml
 
 
-def test_metadata():
+def test_text():
     comment_processed: threading.Event = threading.Event()
 
     class ElementHandler:
@@ -12,6 +12,24 @@ def test_metadata():
             assert not comment_processed.is_set()
             comment_processed.set()
             assert comment.text == " Hello World "
+
+    output: bytearray = bytearray()
+    rewriter: lolhtml.HTMLRewriter = lolhtml.HTMLRewriter(output.extend)
+    rewriter.on("*", ElementHandler())
+    rewriter.write(b"<html><!-- Hello World --></html>")
+    rewriter.end()
+
+    assert comment_processed.is_set()
+
+
+def test_removed():
+    comment_processed: threading.Event = threading.Event()
+
+    class ElementHandler:
+        # noinspection PyMethodMayBeStatic
+        def comments(self, comment: lolhtml.Comment):
+            assert not comment_processed.is_set()
+            comment_processed.set()
             assert not comment.removed
 
     output: bytearray = bytearray()
