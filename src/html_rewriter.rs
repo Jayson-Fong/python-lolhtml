@@ -56,7 +56,6 @@ impl OutputSink for PythonOutputSink {
     }
 }
 
-
 fn rewriting_error_to_py(err: RewritingError) -> PyErr {
     match err {
         RewritingError::ContentHandlerError(e) => {

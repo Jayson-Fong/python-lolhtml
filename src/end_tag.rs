@@ -1,8 +1,9 @@
+use lol_html::html_content::ContentType as NativeContentType;
 use lol_html::html_content::EndTag as NativeEndTag;
 use pyo3::exceptions::PyRuntimeError;
 use pyo3::prelude::*;
 
-use crate::{ContentType, HasNative, IntoNative, NativeRefWrap};
+use crate::{ContentType, HasInner, HasNative, NativeBeforeAfter, NativeRefWrap, PyBeforeAfter};
 
 #[pyclass(unsendable)]
 pub struct EndTag {
@@ -11,6 +12,24 @@ pub struct EndTag {
 
 impl HasNative for EndTag {
     type Native = NativeEndTag<'static>;
+}
+
+impl HasInner<NativeEndTag<'static>> for EndTag {
+    #[inline]
+    fn inner_native(&mut self) -> &mut NativeRefWrap<NativeEndTag<'static>> {
+        &mut self.inner
+    }
+}
+
+impl NativeBeforeAfter for lol_html::html_content::EndTag<'static> {
+    #[inline]
+    fn native_before(&mut self, content: &str, ct: NativeContentType) {
+        self.before(content, ct);
+    }
+    #[inline]
+    fn native_after(&mut self, content: &str, ct: NativeContentType) {
+        self.after(content, ct);
+    }
 }
 
 #[pymethods]
@@ -30,27 +49,13 @@ impl EndTag {
     }
 
     #[pyo3(signature = (content, content_type=None))]
-    pub fn before(
-        &mut self,
-        content: &str,
-        content_type: Option<ContentType>,
-    ) -> PyResult<()> {
-        self.inner
-            .get_mut()?
-            .before(content, content_type.into_native());
-        Ok(())
+    pub fn before(&mut self, content: &str, content_type: Option<ContentType>) -> PyResult<()> {
+        <Self as PyBeforeAfter<NativeEndTag<'static>>>::before_impl(self, content, content_type)
     }
 
     #[pyo3(signature = (content, content_type=None))]
-    pub fn after(
-        &mut self,
-        content: &str,
-        content_type: Option<ContentType>,
-    ) -> PyResult<()> {
-        self.inner
-            .get_mut()?
-            .after(content, content_type.into_native());
-        Ok(())
+    pub fn after(&mut self, content: &str, content_type: Option<ContentType>) -> PyResult<()> {
+        <Self as PyBeforeAfter<NativeEndTag<'static>>>::after_impl(self, content, content_type)
     }
 
     pub fn remove(&mut self) -> PyResult<()> {

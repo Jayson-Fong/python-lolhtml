@@ -125,6 +125,41 @@ impl IntoNative<NativeContentType> for Option<ContentType> {
     }
 }
 
+pub trait HasInner<N> {
+    fn inner_native(&mut self) -> &mut NativeRefWrap<N>;
+}
+
+pub trait NativeBeforeAfter {
+    fn native_before(&mut self, content: &str, ct: NativeContentType);
+    fn native_after(&mut self, content: &str, ct: NativeContentType);
+}
+
+pub trait PyBeforeAfter<N>: HasInner<N>
+where
+    N: NativeBeforeAfter,
+{
+    #[inline]
+    fn before_impl(&mut self, content: &str, content_type: Option<ContentType>) -> PyResult<()> {
+        let ct = content_type.into_native();
+        self.inner_native().get_mut()?.native_before(content, ct);
+        Ok(())
+    }
+
+    #[inline]
+    fn after_impl(&mut self, content: &str, content_type: Option<ContentType>) -> PyResult<()> {
+        let ct = content_type.into_native();
+        self.inner_native().get_mut()?.native_after(content, ct);
+        Ok(())
+    }
+}
+
+impl<T, N> PyBeforeAfter<N> for T
+where
+    T: HasInner<N>,
+    N: NativeBeforeAfter,
+{
+}
+
 use comment::Comment as PyComment;
 use doctype::Doctype as PyDoctype;
 use document_end::DocumentEnd as PyDocumentEnd;

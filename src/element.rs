@@ -1,8 +1,12 @@
+use lol_html::html_content::ContentType as NativeContentType;
 use lol_html::html_content::Element as NativeElement;
+
 use pyo3::exceptions::PyRuntimeError;
 use pyo3::prelude::*;
 
-use crate::{ContentType, HasNative, IntoNative, NativeRefWrap};
+use crate::{
+    ContentType, HasInner, HasNative, IntoNative, NativeBeforeAfter, NativeRefWrap, PyBeforeAfter,
+};
 
 #[pyclass(unsendable)]
 pub struct Element {
@@ -18,6 +22,24 @@ impl Element {
         Self {
             inner: unsafe { NativeRefWrap::wrap(el) },
         }
+    }
+}
+
+impl HasInner<NativeElement<'static, 'static>> for Element {
+    #[inline]
+    fn inner_native(&mut self) -> &mut NativeRefWrap<NativeElement<'static, 'static>> {
+        &mut self.inner
+    }
+}
+
+impl NativeBeforeAfter for lol_html::html_content::Element<'static, 'static> {
+    #[inline]
+    fn native_before(&mut self, content: &str, ct: NativeContentType) {
+        self.before(content, ct);
+    }
+    #[inline]
+    fn native_after(&mut self, content: &str, ct: NativeContentType) {
+        self.after(content, ct);
     }
 }
 
@@ -99,12 +121,7 @@ impl Element {
     }
 
     #[pyo3(signature = (content, content_type=None))]
-
-    pub fn prepend(
-        &mut self,
-        content: &str,
-        content_type: Option<ContentType>,
-    ) -> PyResult<()> {
+    pub fn prepend(&mut self, content: &str, content_type: Option<ContentType>) -> PyResult<()> {
         self.inner
             .get_mut()?
             .prepend(content, content_type.into_native());
@@ -112,40 +129,29 @@ impl Element {
     }
 
     #[pyo3(signature = (content, content_type=None))]
-    pub fn append(
-        &mut self,
-        content: &str,
-        content_type: Option<ContentType>,
-    ) -> PyResult<()> {
+    pub fn append(&mut self, content: &str, content_type: Option<ContentType>) -> PyResult<()> {
         self.inner
             .get_mut()?
             .append(content, content_type.into_native());
         Ok(())
     }
 
-
     #[pyo3(signature = (content, content_type=None))]
-    pub fn before(
-        &mut self,
-        content: &str,
-        content_type: Option<ContentType>,
-    ) -> PyResult<()> {
-        self.inner
-            .get_mut()?
-            .before(content, content_type.into_native());
-        Ok(())
+    pub fn before(&mut self, content: &str, content_type: Option<ContentType>) -> PyResult<()> {
+        <Self as PyBeforeAfter<NativeElement<'static, 'static>>>::before_impl(
+            self,
+            content,
+            content_type,
+        )
     }
 
     #[pyo3(signature = (content, content_type=None))]
-    pub fn after(
-        &mut self,
-        content: &str,
-        content_type: Option<ContentType>,
-    ) -> PyResult<()> {
-        self.inner
-            .get_mut()?
-            .after(content, content_type.into_native());
-        Ok(())
+    pub fn after(&mut self, content: &str, content_type: Option<ContentType>) -> PyResult<()> {
+        <Self as PyBeforeAfter<NativeElement<'static, 'static>>>::after_impl(
+            self,
+            content,
+            content_type,
+        )
     }
 
     #[pyo3(signature = (content, content_type=None))]

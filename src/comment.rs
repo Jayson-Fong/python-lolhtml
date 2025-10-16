@@ -1,7 +1,8 @@
 use lol_html::html_content::Comment as NativeComment;
+use lol_html::html_content::ContentType as NativeContentType;
 use pyo3::prelude::*;
 
-use crate::{ContentType, NativeRefWrap, IntoNative};
+use crate::{ContentType, HasInner, NativeBeforeAfter, NativeRefWrap, PyBeforeAfter};
 
 #[pyclass(unsendable)]
 pub struct Comment {
@@ -13,6 +14,24 @@ impl Comment {
         Self {
             inner: unsafe { NativeRefWrap::wrap(c) },
         }
+    }
+}
+
+impl HasInner<NativeComment<'static>> for Comment {
+    #[inline]
+    fn inner_native(&mut self) -> &mut NativeRefWrap<NativeComment<'static>> {
+        &mut self.inner
+    }
+}
+
+impl NativeBeforeAfter for lol_html::html_content::Comment<'static> {
+    #[inline]
+    fn native_before(&mut self, content: &str, ct: NativeContentType) {
+        self.before(content, ct);
+    }
+    #[inline]
+    fn native_after(&mut self, content: &str, ct: NativeContentType) {
+        self.after(content, ct);
     }
 }
 
@@ -46,27 +65,13 @@ impl Comment {
     }
 
     #[pyo3(signature = (content, content_type=None))]
-    pub fn before(
-        &mut self,
-        content: &str,
-        content_type: Option<ContentType>,
-    ) -> PyResult<()> {
-        self.inner
-            .get_mut()?
-            .before(content, content_type.into_native());
-        Ok(())
+    pub fn before(&mut self, content: &str, content_type: Option<ContentType>) -> PyResult<()> {
+        <Self as PyBeforeAfter<NativeComment<'static>>>::before_impl(self, content, content_type)
     }
 
     #[pyo3(signature = (content, content_type=None))]
-    pub fn after(
-        &mut self,
-        content: &str,
-        content_type: Option<ContentType>,
-    ) -> PyResult<()> {
-        self.inner
-            .get_mut()?
-            .after(content, content_type.into_native());
-        Ok(())
+    pub fn after(&mut self, content: &str, content_type: Option<ContentType>) -> PyResult<()> {
+        <Self as PyBeforeAfter<NativeComment<'static>>>::after_impl(self, content, content_type)
     }
 
     pub fn __repr__(&self) -> PyResult<String> {

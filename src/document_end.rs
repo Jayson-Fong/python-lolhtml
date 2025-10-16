@@ -18,11 +18,7 @@ impl DocumentEnd {
 #[pymethods]
 impl DocumentEnd {
     #[pyo3(signature = (content, content_type=None))]
-    pub fn append(
-        &mut self,
-        content: &str,
-        content_type: Option<ContentType>,
-    ) -> PyResult<()> {
+    pub fn append(&mut self, content: &str, content_type: Option<ContentType>) -> PyResult<()> {
         self.inner
             .get_mut()?
             .append(content, content_type.into_native());
