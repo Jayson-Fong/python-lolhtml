@@ -26,10 +26,12 @@
 # Purpose
 
 python-lolhtml provides Python bindings for the [lol-html](https://crates.io/crates/lol_html) Rust crate, enabling
-HTML rewriting and parsing with minimal buffering while using CSS selectors.
+stream-capable HTML rewriting and parsing with minimal buffering while using CSS selectors.
 
 It is particularly powerful when using Python as a reverse proxy to transform HTML content, such as for rewriting mixed
-content links; however, while the API isn't directly made for it, it can also be used for web scraping.
+content links; however, while the API isn't directly made for it, it can also be used for web scraping. Through 
+leveraging lol-html's streaming capabilities, content can be rewritten or parsed even when the content has not been 
+fully received yet, enabling faster response times.
 
 # Performance
 
