@@ -2,7 +2,7 @@
 <div align="center">
    <h1>😂 python-lolhtml</h1>
 
-[![Build Status](https://github.com/Jayson-Fong/python-lolhtml/actions/workflows/test-package.yml/badge.svg?branch=main)](https://github.com/Jayson-Fong/python-lolhtml/actions/workflows/test-package.yml)
+[![Build Status](https://github.com/Jayson-Fong/python-lolhtml/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/Jayson-Fong/python-lolhtml/actions/workflows/CI.yml)
 [![Latest Version](https://img.shields.io/pypi/v/python-lolhtml.svg)](https://pypi.org/project/python-lolhtml/)
 [![Python Versions](https://img.shields.io/pypi/pyversions/python-lolhtml.svg)](https://pypi.org/project/python-lolhtml/)
 [![Format](https://img.shields.io/pypi/format/python-lolhtml.svg)](https://pypi.org/project/python-lolhtml/)
