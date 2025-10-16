@@ -12,6 +12,9 @@ on:
       - master
     tags:
       - '*'
+    paths-ignore:
+      - README.md
+      - LICENSE
   pull_request:
   workflow_dispatch:
 
