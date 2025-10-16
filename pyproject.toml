@@ -12,7 +12,7 @@ authors = [
 description = "Python bindings for the lol-html Rust crate"
 readme = "README.md"
 license = { text = "MIT + BSD-3-Clause (for bundled lol-html)" }
-license-files = ["LICENSE-MIT", "LICENSE-BSD"]
+license-files = ["LICENSE", "LICENSE-MIT", "LICENSE-BSD"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "License :: OSI Approved :: MIT License",
