@@ -6,7 +6,7 @@ import lolhtml
 def test_text():
     comment_processed: threading.Event = threading.Event()
 
-    class ElementHandler:
+    class DocumentHandler:
         # noinspection PyMethodMayBeStatic
         def comments(self, comment: lolhtml.Comment):
             assert not comment_processed.is_set()
@@ -15,10 +15,11 @@ def test_text():
 
     output: bytearray = bytearray()
     rewriter: lolhtml.HTMLRewriter = lolhtml.HTMLRewriter(output.extend)
-    rewriter.on("*", ElementHandler())
+    rewriter.on_document(DocumentHandler())
     rewriter.write(b"<html><!-- Hello World --></html>")
     rewriter.end()
 
+    assert output == b"<html><!-- Hello World --></html>"
     assert comment_processed.is_set()
 
 
@@ -38,13 +39,14 @@ def test_removed():
     rewriter.write(b"<html><!-- Hello World --></html>")
     rewriter.end()
 
+    assert output == b"<html><!-- Hello World --></html>"
     assert comment_processed.is_set()
 
 
 def test_set_text():
     comment_processed: threading.Event = threading.Event()
 
-    class ElementHandler:
+    class DocumentHandler:
         # noinspection PyMethodMayBeStatic
         def comments(self, comment: lolhtml.Comment):
             assert not comment_processed.is_set()
@@ -53,7 +55,7 @@ def test_set_text():
 
     output: bytearray = bytearray()
     rewriter: lolhtml.HTMLRewriter = lolhtml.HTMLRewriter(output.extend)
-    rewriter.on("html", ElementHandler())
+    rewriter.on_document(DocumentHandler())
 
     rewriter.write(b"<html><!-- Hello World --></html>")
     rewriter.end()
@@ -65,7 +67,7 @@ def test_set_text():
 def test_remove():
     comment_processed: threading.Event = threading.Event()
 
-    class ElementHandler:
+    class DocumentHandler:
         # noinspection PyMethodMayBeStatic
         def comments(self, comment: lolhtml.Comment):
             assert not comment_processed.is_set()
@@ -75,7 +77,7 @@ def test_remove():
 
     output: bytearray = bytearray()
     rewriter: lolhtml.HTMLRewriter = lolhtml.HTMLRewriter(output.extend)
-    rewriter.on("html", ElementHandler())
+    rewriter.on_document(DocumentHandler())
 
     rewriter.write(b"<html><!-- Hello World --></html>")
     rewriter.end()
@@ -87,7 +89,7 @@ def test_remove():
 def test_before_text_inferred():
     comment_processed: threading.Event = threading.Event()
 
-    class ElementHandler:
+    class DocumentHandler:
         def comments(self, comment: lolhtml.Comment):
             assert not comment_processed.is_set()
             comment_processed.set()
@@ -95,7 +97,7 @@ def test_before_text_inferred():
 
     output: bytearray = bytearray()
     rewriter: lolhtml.HTMLRewriter = lolhtml.HTMLRewriter(output.extend)
-    rewriter.on("html", ElementHandler())
+    rewriter.on_document(DocumentHandler())
 
     rewriter.write(b"<html><!-- Hello World --></html>")
     rewriter.end()
@@ -107,7 +109,7 @@ def test_before_text_inferred():
 def test_before_text_explicit():
     comment_processed: threading.Event = threading.Event()
 
-    class ElementHandler:
+    class DocumentHandler:
         def comments(self, comment: lolhtml.Comment):
             assert not comment_processed.is_set()
             comment_processed.set()
@@ -115,7 +117,7 @@ def test_before_text_explicit():
 
     output: bytearray = bytearray()
     rewriter: lolhtml.HTMLRewriter = lolhtml.HTMLRewriter(output.extend)
-    rewriter.on("html", ElementHandler())
+    rewriter.on_document(DocumentHandler())
 
     rewriter.write(b"<html><!-- Hello World --></html>")
     rewriter.end()
@@ -127,7 +129,7 @@ def test_before_text_explicit():
 def test_before_html():
     comment_processed: threading.Event = threading.Event()
 
-    class ElementHandler:
+    class DocumentHandler:
         def comments(self, comment: lolhtml.Comment):
             assert not comment_processed.is_set()
             comment_processed.set()
@@ -135,7 +137,7 @@ def test_before_html():
 
     output: bytearray = bytearray()
     rewriter: lolhtml.HTMLRewriter = lolhtml.HTMLRewriter(output.extend)
-    rewriter.on("html", ElementHandler())
+    rewriter.on_document(DocumentHandler())
 
     rewriter.write(b"<html><!-- Hello World --></html>")
     rewriter.end()
@@ -147,7 +149,7 @@ def test_before_html():
 def test_after_text_inferred():
     comment_processed: threading.Event = threading.Event()
 
-    class ElementHandler:
+    class DocumentHandler:
         def comments(self, comment: lolhtml.Comment):
             assert not comment_processed.is_set()
             comment_processed.set()
@@ -155,7 +157,7 @@ def test_after_text_inferred():
 
     output: bytearray = bytearray()
     rewriter: lolhtml.HTMLRewriter = lolhtml.HTMLRewriter(output.extend)
-    rewriter.on("html", ElementHandler())
+    rewriter.on_document(DocumentHandler())
 
     rewriter.write(b"<html><!-- Hello World --></html>")
     rewriter.end()
@@ -167,7 +169,7 @@ def test_after_text_inferred():
 def test_after_text_explicit():
     comment_processed: threading.Event = threading.Event()
 
-    class ElementHandler:
+    class DocumentHandler:
         def comments(self, comment: lolhtml.Comment):
             assert not comment_processed.is_set()
             comment_processed.set()
@@ -175,7 +177,7 @@ def test_after_text_explicit():
 
     output: bytearray = bytearray()
     rewriter: lolhtml.HTMLRewriter = lolhtml.HTMLRewriter(output.extend)
-    rewriter.on("html", ElementHandler())
+    rewriter.on_document(DocumentHandler())
 
     rewriter.write(b"<html><!-- Hello World --></html>")
     rewriter.end()
@@ -187,7 +189,7 @@ def test_after_text_explicit():
 def test_after_html():
     comment_processed: threading.Event = threading.Event()
 
-    class ElementHandler:
+    class DocumentHandler:
         def comments(self, comment: lolhtml.Comment):
             assert not comment_processed.is_set()
             comment_processed.set()
@@ -195,7 +197,7 @@ def test_after_html():
 
     output: bytearray = bytearray()
     rewriter: lolhtml.HTMLRewriter = lolhtml.HTMLRewriter(output.extend)
-    rewriter.on("html", ElementHandler())
+    rewriter.on_document(DocumentHandler())
 
     rewriter.write(b"<html><!-- Hello World --></html>")
     rewriter.end()
