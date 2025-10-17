@@ -171,7 +171,8 @@ with requests.get("https://example.com", stream=True) as r:
     print(output.decode("utf-8"))
 ```
 
-A variety of method and property-specific examples can be found in [python-lolhtml/tests](https://github.com/Jayson-Fong/python-lolhtml/tree/main/tests).
+A variety of method and property-specific examples can be found in [python-lolhtml/tests](https://github.com/Jayson-Fong/python-lolhtml/tree/main/tests) and 
+[python-lolhtml/examples](https://github.com/Jayson-Fong/python-lolhtml/tree/main/examples).
 
 # License
 

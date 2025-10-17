@@ -38,13 +38,17 @@ def test_full():
     rewriter.on_document(DocumentHandler())
 
     # noinspection HttpUrlsUsage
-    rewriter.write(b'<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" '
-                   b'"http://www.w3.org/TR/html4/loose.dtd"><a href="example">Link</a>')
+    rewriter.write(
+        b'<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" '
+        b'"http://www.w3.org/TR/html4/loose.dtd"><a href="example">Link</a>'
+    )
     rewriter.end()
 
     # noinspection HttpUrlsUsage
-    assert output == (b'<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" '
-                      b'"http://www.w3.org/TR/html4/loose.dtd"><a href="example">Link</a>')
+    assert output == (
+        b'<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" '
+        b'"http://www.w3.org/TR/html4/loose.dtd"><a href="example">Link</a>'
+    )
     assert comment_processed.is_set()
 
 
