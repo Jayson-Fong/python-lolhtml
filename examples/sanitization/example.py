@@ -14,7 +14,7 @@ class LinkInsertionHandler:
 
 output: bytearray = bytearray()
 rewriter: lolhtml.HTMLRewriter = lolhtml.HTMLRewriter(output.extend)
-rewriter.on("main>*", LinkInsertionHandler())
+rewriter.on("*", LinkInsertionHandler())
 
 webpage_path: pathlib.Path = pathlib.Path(__file__).parent.joinpath("webpage.html")
 with open(webpage_path, "rb") as f:
