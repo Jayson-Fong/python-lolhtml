@@ -13,7 +13,7 @@ streaming content and writing in chunks.
 
 > [!CAUTION]
 > It is generally a bad idea to make your own sanitizer, especially if your use case prompts a more permissive set of 
-> rules. If you are not sure about what you are doing, consider using another purpose-built package like 
+> rules. If you are not sure about what you are doing, consider using a purpose-built package like 
 > [nh3](https://pypi.org/project/nh3/) or [bleach](https://pypi.org/project/bleach/).
 
 > [!CAUTION]
