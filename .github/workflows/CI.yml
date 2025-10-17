@@ -17,7 +17,7 @@ on:
       - LICENSE
       - LICENSE-MIT
       - LICENSE-BSD
-      - examples
+      - "examples/*"
   pull_request:
   workflow_dispatch:
 

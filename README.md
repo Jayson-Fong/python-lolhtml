@@ -17,7 +17,8 @@
 
 <div align="center">
 
-[💼 Purpose](#purpose) | [⚡ Performance](#performance) | [⚙️ Usage](#usage) | [⚖️ License](#license)
+[💼 Purpose](#purpose) | [⚡ Performance](#performance) | [🛠️ Installation](#installation) | [⚙️ Usage](#usage) | 
+[⚖️ License](#license)
 
 </div>
 
@@ -109,6 +110,20 @@ print("python-lolhtml Speedup:", beautiful_soup_time / python_lolhtml_time)
 </details>
 
 </details>
+
+# Installation
+
+python-lolhtml is available for installation from PyPI:
+
+```shell
+python -m pip install python-lolhtml
+```
+
+For the latest development builds, you may alternatively build the package yourself from GitHub:
+
+```shell
+python3 -m pip install git+https://github.com/Jayson-Fong/python-lolhtml.git
+```
 
 # Usage
 

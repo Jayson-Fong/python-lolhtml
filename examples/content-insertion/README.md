@@ -3,7 +3,8 @@ Content Insertion
 
 This example leverages python-lolhtml to insert a navigation link into a webpage.
 
-It specifically inserts a new `Sales` navigation entry after the 2nd navigation entry using the following CSS selector:
+It specifically inserts a new `Sales` navigation entry after the second navigation entry using the following CSS 
+selector:
 
 ```css
 nav > ul > li:nth-of-type(2)
