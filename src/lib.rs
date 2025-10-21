@@ -75,10 +75,12 @@ pub enum ContentType {
     Html,
 }
 
-impl<'py> FromPyObject<'py> for ContentType {
-    fn extract_bound(ob: &Bound<'py, PyAny>) -> PyResult<Self> {
+impl<'a, 'py> FromPyObject<'a, 'py> for ContentType {
+    type Error = PyErr;
+
+    fn extract(obj: Borrowed<'a, 'py, PyAny>) -> Result<Self, Self::Error> {
         // Try to get Enum.value if passed a Python Enum
-        if let Ok(val_obj) = ob.getattr("value") {
+        if let Ok(val_obj) = obj.getattr("value") {
             if let Ok(v) = val_obj.extract::<u8>() {
                 return match v {
                     0 => Ok(ContentType::Text),
@@ -88,7 +90,7 @@ impl<'py> FromPyObject<'py> for ContentType {
             }
         }
         // Fallback: look at Enum.name
-        if let Ok(name_obj) = ob.getattr("name") {
+        if let Ok(name_obj) = obj.getattr("name") {
             if let Ok(name) = name_obj.extract::<&str>() {
                 return match name {
                     "TEXT" | "Text" | "text" => Ok(ContentType::Text),
@@ -98,7 +100,7 @@ impl<'py> FromPyObject<'py> for ContentType {
             }
         }
         // Fallback: accept integers 0/1
-        if let Ok(v) = ob.extract::<u8>() {
+        if let Ok(v) = obj.extract::<u8>() {
             return match v {
                 0 => Ok(ContentType::Text),
                 1 => Ok(ContentType::Html),

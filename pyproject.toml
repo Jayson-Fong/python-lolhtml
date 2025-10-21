@@ -4,14 +4,13 @@ build-backend = "maturin"
 
 [project]
 name = "python-lolhtml"
-version = "0.0.2"
 requires-python = ">=3.8"
 authors = [
     {name = "Jayson Fong", email = "jayson.fong@gatech.edu"}
 ]
 description = "Python bindings for the lol-html Rust crate"
 readme = "README.md"
-license = { text = "MIT + BSD-3-Clause (for bundled lol-html)" }
+license = { text = "BSD-3-Clause" }
 license-files = ["LICENSE", "LICENSE-MIT", "LICENSE-BSD"]
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -26,6 +25,7 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Typing :: Stubs Only"
 ]
+dynamic = ["version"]
 
 [tool.maturin]
 features = ["pyo3/extension-module"]
